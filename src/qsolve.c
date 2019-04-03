@@ -15,29 +15,34 @@ int main(int argc, char const *argv[]) {
     int ret = 0;
     char userInput[255];
     int length = 255;
+    int cmp = 1;
+    
+    while(cmp){
+		double a = 0, b = 0, c = 0;
+	   	double x1 = 0, x2 = 0;
 
-    double a = 0, b = 0, c = 0;
-    double x1 = 0, x2 = 0;
+		printf("\nQuad Solver\nVersion 1.0\n\n");
+		printf("This program takes 3 arguments representing a, b, and c in a quadratic equation and solves for its roots using the quadratic formula\n\n");
+		printf("Press enter to continue or press \'h\' for help...\n");
+		scanf("%[^\n]", userInput);
+		getchar();
 
-    printf("\nQuad Solver\nVersion 1.0\n\n");
-    printf("This program takes 3 arguments representing a, b, and c in a quadratic equation and solves for its roots using the quadratic formula\n\n");
-    printf("Press enter to continue or press \'h\' for help...\n");
-    scanf("%[^\n]", userInput);
-    getchar();
-
-    if (strcmp(userInput, "h") == 0) {
-        // ret = qsHelp();
-        printf("Help\n");
-    }
-
-    if (ret == 0)
-        ret = qsGetLine(userInput, &length);
-    if (ret == 0)
-        ret = qsValidate(userInput, length, &a, &b, &c);
-    if (ret == 0)
-        ret = qsSolve(a, b, c, &x1, &x2);
-    if (ret == 0)
-        ret = qsResult(x1, x2, ret);
+		if (strncmp(userInput, "h", length) == 0) {
+			// ret = qsHelp();
+			printf("Help\n");
+		}
+		
+		if (ret == 0)
+			ret = qsGetLine(userInput, &length);
+		if((cmp = strncmp(userInput, "q\n", length))){
+			if (ret == 0)
+				ret = qsValidate(userInput, length, &a, &b, &c);
+			if (ret == 0)
+				ret = qsSolve(a, b, c, &x1, &x2);
+			if (ret == 0)
+				ret = qsResult(x1, x2, ret);
+		}
+	}
 
     return ret;
 }
@@ -46,6 +51,7 @@ int qsGetLine(char * line, int * nline) {
     int ret = 0;
 
     printf("input a b c: <a> <b> <c>\n");
+    printf("or q to exit\n");
     if (fgets(line, *nline, stdin) == NULL) {
         ret = -1;
     } else {
@@ -83,7 +89,9 @@ int qsValidate(char * line, int nline, double * a, double * b, double * c) {
         }
         i++;
     }
-
+    
+    printf("You entered: a:%lf b:%lf c:%lf\n\n", *a, *b, *c);
+		
     return ret;
 }
 
@@ -108,11 +116,16 @@ int qsResult(double x1, double x2, int ret) {
 
     if (isnan(x1) || isnan(x2)) { // NO REAL ROOTS
         printf("There are no real roots. There are two complex roots.\n");
+        printf("%.8lf, %.8lf\n", x1, x2);
     } else if (x1 == x2) { // DOUBLE REAL ROOT
         printf("There is one real root: %.8lf\n", x1);
     } else { // TWO REAL ROOTS
-        printf("There are two real roots: %.8lf %.8lf\n", x1, x2);
+        printf("There are two real roots: %.8lf, %.8lf\n", x1, x2);
     }
+    
+    printf("Press enter to continue...");
+    getchar();
+    printf("----------------------------------------\n");
 
     // INTERNAL ERROR
 
