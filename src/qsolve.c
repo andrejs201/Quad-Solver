@@ -16,8 +16,8 @@ int main(int argc, char const *argv[]) {
     char userInput[255];
     int length = 255;
     int cmp = 1;
-    
-    while(cmp){
+
+    while(cmp) {
 		double a = 0, b = 0, c = 0;
 	   	double x1 = 0, x2 = 0;
 
@@ -27,14 +27,13 @@ int main(int argc, char const *argv[]) {
 		scanf("%[^\n]", userInput);
 		getchar();
 
-		if (strncmp(userInput, "h", length) == 0) {
-			// ret = qsHelp();
-			printf("Help\n");
-		}
-		
+		if (strncmp(userInput, "h", length) == 0)
+			ret = qsHelp();
+
 		if (ret == 0)
 			ret = qsGetLine(userInput, &length);
-		if((cmp = strncmp(userInput, "q\n", length))){
+
+		if((cmp = strncmp(userInput, "q\n", length))) {
 			if (ret == 0)
 				ret = qsValidate(userInput, length, &a, &b, &c);
 			if (ret == 0)
@@ -89,9 +88,9 @@ int qsValidate(char * line, int nline, double * a, double * b, double * c) {
         }
         i++;
     }
-    
-    printf("You entered: a:%lf b:%lf c:%lf\n\n", *a, *b, *c);
-		
+
+    printf("\nYou entered: a: %.8lf b: %.8lf c: %.8lf\n\n", *a, *b, *c);
+
     return ret;
 }
 
@@ -115,14 +114,14 @@ int qsResult(double x1, double x2, int ret) {
     // INPUT A, B, C SHOULD BE IEEE FP 32 BIT NORMALIZED VALUES W/ NO MORE THAN 8 DECIMAL PLACES
 
     if (isnan(x1) || isnan(x2)) { // NO REAL ROOTS
-        printf("There are no real roots. There are two complex roots.\n");
+        printf("There are no real roots. There are two complex roots.\n\n");
         printf("%.8lf, %.8lf\n", x1, x2);
     } else if (x1 == x2) { // DOUBLE REAL ROOT
-        printf("There is one real root: %.8lf\n", x1);
+        printf("There is one real root: %.8lf\n\n", x1);
     } else { // TWO REAL ROOTS
-        printf("There are two real roots: %.8lf, %.8lf\n", x1, x2);
+        printf("There are two real roots: %.8lf, %.8lf\n\n", x1, x2);
     }
-    
+
     printf("Press enter to continue...");
     getchar();
     printf("----------------------------------------\n");
@@ -157,8 +156,12 @@ int qsResult(double x1, double x2, int ret) {
 //     return ret;
 // }
 //
-// int qsHelp() {
-//     int ret = 0;
-//
-//     return ret;
-// }
+int qsHelp() {
+    int ret = 0;
+
+    printf("\nEnter three numbers. Make sure to include a space between "
+            "each number. Numbers you enter cannot exceed 8 decimal places.\n\n"
+            "Example: 2.25 18 7.66554542\n\n");
+
+    return ret;
+}

@@ -9,6 +9,5 @@ clean:
 	rm -f *.o core qsolve
 test:
 	./qsolve
-	
 val:
 	valgrind ./qsolve
