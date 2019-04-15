@@ -13,12 +13,13 @@ Description: This program takes 3 arguments representing a, b, and c in a
 
 int main(int argc, char const *argv[]) {
     int ret = 0;
-    char userInput[255];
-    int length = 255;
     int cmp = 1;
+    char userInput[255];
 
-    while(cmp) {
-		double a = 0, b = 0, c = 0;
+    while (cmp) {
+
+        int length = 255;
+        double a = 0, b = 0, c = 0;
 	   	double x1 = 0, x2 = 0;
 
 		printf("\nQuad Solver\nVersion 1.0\n\n");
@@ -33,14 +34,21 @@ int main(int argc, char const *argv[]) {
 		if (ret == 0)
 			ret = qsGetLine(userInput, &length);
 
-		if((cmp = strncmp(userInput, "q\n", length))) {
-			if (ret == 0)
+		if ((cmp = strncmp(userInput, "q\n", length))) {
+
+            if (ret == 0)
 				ret = qsValidate(userInput, length, &a, &b, &c);
+
 			if (ret == 0)
 				ret = qsSolve(a, b, c, &x1, &x2);
+
 			if (ret == 0)
 				ret = qsResult(x1, x2, ret);
+
 		}
+
+        if (ret != 0)
+            ret = qsError(ret);
 	}
 
     return ret;
@@ -51,10 +59,11 @@ int qsGetLine(char * line, int * nline) {
 
     printf("input a b c: <a> <b> <c>\n");
     printf("or q to exit\n");
+
     if (fgets(line, *nline, stdin) == NULL) {
-        ret = -1;
+        ret = 1;
     } else {
-        *nline = strlen(line) + 1;
+        *nline = strlen(line);
     }
 
     return ret;
@@ -62,40 +71,42 @@ int qsGetLine(char * line, int * nline) {
 
 int qsValidate(char * line, int nline, double * a, double * b, double * c) {
     int ret = 0;
-    int i = 0;
     char * token;
+    int token_num = 1;
+    int scanned = 0;
 
-    while (i < nline) {
-        token = strtok(line, " ");
-        int token_num = 1;
-        while (token != NULL) {
-            switch(token_num) {
-                case(1):
-                    sscanf(token, "%lf", a);
-                    break;
-                case(2):
-                    sscanf(token, "%lf", b);
-                    break;
-                case(3):
-                    sscanf(token, "%lf", c);
-                    break;
-            }
-            token = strtok(NULL, " ");
-            token_num++;
-
-            if (token_num > 4)
-                ret = -1;
+    token = strtok(line, " ");
+    while (token != NULL) {
+        switch(token_num) {
+            case(1):
+                scanned += sscanf(token, "%lf", a);
+                break;
+            case(2):
+                scanned += sscanf(token, "%lf", b);
+                break;
+            case(3):
+                scanned += sscanf(token, "%lf", c);
+                break;
         }
-        i++;
+        token = strtok(NULL, " ");
+        token_num++;
     }
 
-    printf("\nYou entered: a: %.8lf b: %.8lf c: %.8lf\n\n", *a, *b, *c);
+    if (scanned != 3 || token_num > 4)
+        ret = 1;
+
+    if (ret == 0)
+        fprintf(stdout, "\nYou entered: a: %.8lf b: %.8lf c: %.8lf\n\n", *a, *b, *c);
 
     return ret;
 }
 
 int qsSolve(double a, double b, double c, double * x1, double * x2) {
     int ret = 0;
+    // GIVE FEEDBACK ON BAD INPUT DATA
+    // INPUT A, B, C SHOULD BE IEEE FP 32 BIT NORMALIZED VALUES W/ NO MORE THAN 8 DECIMAL PLACES
+
+
     double underSqrt = (b * b) - (4 * a * c);
 
     if (underSqrt == 0) {
@@ -110,12 +121,9 @@ int qsSolve(double a, double b, double c, double * x1, double * x2) {
 }
 
 int qsResult(double x1, double x2, int ret) {
-    // GIVE FEEDBACK ON BAD INPUT DATA
-    // INPUT A, B, C SHOULD BE IEEE FP 32 BIT NORMALIZED VALUES W/ NO MORE THAN 8 DECIMAL PLACES
 
     if (isnan(x1) || isnan(x2)) { // NO REAL ROOTS
         printf("There are no real roots. There are two complex roots.\n\n");
-        printf("%.8lf, %.8lf\n", x1, x2);
     } else if (x1 == x2) { // DOUBLE REAL ROOT
         printf("There is one real root: %.8lf\n\n", x1);
     } else { // TWO REAL ROOTS
@@ -139,10 +147,27 @@ int qsResult(double x1, double x2, int ret) {
 //     return ret;
 // }
 //
-// int qsError(int ret) {
-//
-//     return ret;
-// }
+int qsError(int ret) {
+
+    switch(ret) {
+        case(1):
+            printf("\nBad input.\n\n");
+            qsHelp();
+            break;
+        case(2):
+            printf("\nInput a, b, c should be IEEE floating point 32 bit normalized values, with no more than 8 decimal places.\n\n");
+            break;
+        case(3):
+            printf("\nWarning: Possible loss of significance.\n\n");
+            break;
+        case(4):
+            printf("\nInternal error.\n\n");
+            break;
+    }
+
+    ret = 0;
+    return ret;
+}
 //
 // int qsLogEnable() {
 //     int ret = 0;
@@ -159,9 +184,10 @@ int qsResult(double x1, double x2, int ret) {
 int qsHelp() {
     int ret = 0;
 
-    printf("\nEnter three numbers. Make sure to include a space between "
+    printf("Enter three numbers. Make sure to include a space between "
             "each number. Numbers you enter cannot exceed 8 decimal places.\n\n"
             "Example: 2.25 18 7.66554542\n\n");
+    printf("----------------------------------------\n");
 
     return ret;
 }
