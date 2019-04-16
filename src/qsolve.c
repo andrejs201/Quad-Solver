@@ -13,8 +13,11 @@ Description: This program takes 3 arguments representing a, b, and c in a
 
 int main(int argc, char const *argv[]) {
     int ret = 0;
-    int cmp = 1;
+    int cmp = 1;                                    //Condition variable for main loop
+    int logEnable = 0;                              //Toggle to enable error logging
+    int testNum = 1;                                //Number of times the program has run consecutively
     char userInput[255];
+    FILE * outfile = fopen("error.txt","w");        //Error logging file
 
     while (cmp) {
 
@@ -23,13 +26,17 @@ int main(int argc, char const *argv[]) {
 	   	double x1 = 0, x2 = 0;
 
 		printf("\nQuad Solver\nVersion 1.0\n\n");
-		printf("This program takes 3 arguments representing a, b, and c in a quadratic equation and solves for its roots using the quadratic formula\n\n");
-		printf("Press enter to continue or press \'h\' for help...\n");
+		printf("This program takes 3 arguments representing a, b, and c in a quadratic equation"
+                                     "and solves for its roots using the quadratic formula\n\n");
+		printf("Press enter to continue, \'l\' to toggle error logging, or \'h\' for help...\n");
 		scanf("%[^\n]", userInput);
 		getchar();
 
-		if (strncmp(userInput, "h", length) == 0)
+		if (strncmp(userInput, "h", length) == 0) {
 			ret = qsHelp();
+        } else if (strncmp(userInput, "l", length) == 0) {
+            ret = qsLogEnable(&logEnable);
+        }
 
 		if (ret == 0)
 			ret = qsGetLine(userInput, &length);
@@ -44,13 +51,18 @@ int main(int argc, char const *argv[]) {
 
 			if (ret == 0)
 				ret = qsResult(x1, x2, ret);
-
 		}
 
-        if (ret != 0)
+        if (logEnable == 1 && ret != 0) {
+            ret = qsLog(ret, testNum, a, b, c, outfile);
+        } else if (ret != 0) {
             ret = qsError(ret);
+        }
+
+        testNum++;
 	}
 
+    fclose(outfile);
     return ret;
 }
 
@@ -168,19 +180,47 @@ int qsError(int ret) {
     ret = 0;
     return ret;
 }
-//
-// int qsLogEnable() {
-//     int ret = 0;
-//
-//     return ret;
-// }
-//
-// int qsLog() {
-//     int ret = 0;
-//
-//     return ret;
-// }
-//
+
+int qsLogEnable(int * logEnable) {
+    int ret = 0;
+
+    if (*logEnable == 0) {
+        *logEnable = 1;
+    } else {
+        *logEnable = 0;
+    }
+
+    return ret;
+}
+
+int qsLog(int ret, int testNum, double a, double b, double c, FILE * outfile) {
+
+    fprintf(outfile, "Test #%d\nInput: %.8lf %.8lf %.8lf\n", testNum, a, b, c);
+
+    switch(ret) {
+        case(1):
+            fprintf(outfile, "\nBad input.\n\n");
+            break;
+        case(2):
+            fprintf(outfile, "\nInput a, b, c should be IEEE floating point 32 bit normalized values, with no more than 8 decimal places.\n\n");
+            break;
+        case(3):
+            fprintf(outfile, "\nWarning: Possible loss of significance.\n\n");
+            break;
+        case(4):
+            fprintf(outfile, "\nInternal error.\n\n");
+            break;
+    }
+
+    printf("\nError occurred. Feedback printed to log file called \"error.txt\"\n");
+    printf("\nPress enter to continue...");
+    getchar();
+    printf("----------------------------------------\n");
+
+    ret = 0;
+    return ret;
+}
+
 int qsHelp() {
     int ret = 0;
 

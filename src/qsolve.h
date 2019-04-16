@@ -7,8 +7,8 @@ int qsSolve(double a, double b, double c, double * x1, double * x2);
 int qsError(int ret);
 int qsResult(double x1, double x2, int ret);
 int qsPutLine(char * line, int nline);
-int qsLogEnable();
-int qsLog();
+int qsLogEnable(int * logEnable);
+int qsLog(int ret, int testNum, double a, double b, double c, FILE * outfile);
 int qsHelp();
 
 #endif
