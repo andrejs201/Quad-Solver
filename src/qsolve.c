@@ -9,6 +9,7 @@ Description: This program takes 3 arguments representing a, b, and c in a
 #include <stdlib.h>
 #include <string.h>
 #include <math.h>
+#include "verify.h"
 #include "qsolve.h"
 
 int main(int argc, char const *argv[]) {
@@ -117,7 +118,9 @@ int qsSolve(double a, double b, double c, double * x1, double * x2) {
     int ret = 0;
     // GIVE FEEDBACK ON BAD INPUT DATA
     // INPUT A, B, C SHOULD BE IEEE FP 32 BIT NORMALIZED VALUES W/ NO MORE THAN 8 DECIMAL PLACES
-
+	a = verifyDecimalPlacement(a, 8);
+	b = verifyDecimalPlacement(b, 8);
+	c = verifyDecimalPlacement(c, 8);
 
     double underSqrt = (b * b) - (4 * a * c);
 
